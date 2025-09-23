@@ -15,7 +15,11 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.util.ImageUtil;
 
+import java.awt.image.BufferedImage;
 import java.util.Set;
 
 /**
@@ -67,7 +71,9 @@ public class FarmTrackerPlugin extends Plugin
 	private Item[] LastInventory = null;
 	//
 
-	private FarmTrackerPanel panel;
+
+	@Inject
+	private ClientToolbar clientToolbar;
 
 	@Inject
 	private ItemManager itemManager;
@@ -77,6 +83,9 @@ public class FarmTrackerPlugin extends Plugin
 
 	@Inject
 	private FarmTrackerConfig config;
+
+	private FarmTrackerPanel panel;
+	private NavigationButton navButton;
 
 	private boolean isInFarmingRegion() {
 		Player local = client.getLocalPlayer();
@@ -233,6 +242,17 @@ public class FarmTrackerPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		panel = new FarmTrackerPanel(this, itemManager, config);
+
+		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "panel_icon.png");
+
+		navButton = NavigationButton.builder()
+				.tooltip("Farm Tracker")
+				.icon(icon)
+				.priority(5)
+				.panel(panel)
+				.build();
+
+		clientToolbar.addNavigation(navButton);
 		/*
 		 * Load Data
 		 */
@@ -242,6 +262,7 @@ public class FarmTrackerPlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
+		clientToolbar.removeNavigation(navButton);
 		/*
 		 * Save Data
 		 */
