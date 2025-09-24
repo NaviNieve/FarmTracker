@@ -5,25 +5,6 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
-/*
-Time Options:
-Regional/British
-24hr/12hr
-Track Options:
-GE Buy
-GE Sell
-Allotment
-Flower
-Herb
-Hops
-Bush
-Tree
-Fruit Tree
-Special
-Special Trees
-Cactus
- */
-
 @ConfigGroup("farmtracker")
 public interface FarmTrackerConfig extends Config
 {

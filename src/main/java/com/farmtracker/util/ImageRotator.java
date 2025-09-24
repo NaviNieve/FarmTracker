@@ -1,4 +1,4 @@
-package com.farmtracker;
+package com.farmtracker.util;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

@@ -9,6 +9,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -20,6 +21,7 @@ import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -82,9 +84,12 @@ public class FarmTrackerPlugin extends Plugin
 	private Client client;
 
 	@Inject
+	public ClientThread clientThread;
+
+	@Inject
 	private FarmTrackerConfig config;
 
-	private FarmTrackerPanel panel;
+	private TrackerPanel panel;
 	private NavigationButton navButton;
 
 	private boolean isInFarmingRegion() {
@@ -139,12 +144,21 @@ public class FarmTrackerPlugin extends Plugin
 
 		return newArr;
 	}
+	public int getCurrentPrice(int ItemID) {
+		if(client.isClientThread()) {
+			return itemManager.getItemPrice(ItemID);
+		} else {
+			log.error("Not on client Thread!");
+			return 0;
+		}
+	}
+
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event) {
 		Item[] CurrentInventory = event.getItemContainer().getItems();
 		if(LastInventory == null) {
 			// Better method would be to set *LastInventory on (Farming Region Entered)
-			LastInventory = client.getItemContainer(InventoryID.INVENTORY).getItems();
+			LastInventory = Objects.requireNonNull(client.getItemContainer(InventoryID.INVENTORY)).getItems();
 		}
 		else if(!isInFarmingRegion()) {
 			// Better method would be to set *LastInventory on (Farming Region Entered)
@@ -241,7 +255,7 @@ public class FarmTrackerPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		panel = new FarmTrackerPanel(this, itemManager, config);
+		panel = new TrackerPanel(this, itemManager, config);
 
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "panel_icon.png");
 
